@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>zh_TW</string>
+    <key>CFBundleDisplayName</key>
+    <string>Spotify Lyricify for Mac</string>
+    <key>CFBundleExecutable</key>
+    <string>SpotifyLyricifyForMac</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.phinsin.spotify-lyricify-for-mac</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Spotify Lyricify for Mac</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.music</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>讀取 Spotify 目前播放的歌曲並控制播放。</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSHumanReadableCopyright</key>
+    <string>Open-source project; not affiliated with Spotify or Lyricify.</string>
+</dict>
+</plist>
