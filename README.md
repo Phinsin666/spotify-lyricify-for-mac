@@ -46,16 +46,12 @@ Spotify Lyricify for Mac keeps the current lyric visible in a compact floating b
 
 ## Installation
 
-Clone the repository and build the application locally:
+1. Download the latest `.dmg` from [Releases](https://github.com/Phinsin666/spotify-lyricify-for-mac/releases/latest).
+2. Open the disk image.
+3. Drag **Spotify Lyricify for Mac** into the **Applications** folder.
+4. Launch the app from Applications.
 
-```bash
-git clone https://github.com/Phinsin666/spotify-lyricify-for-mac.git
-cd spotify-lyricify-for-mac
-./scripts/build-app.sh
-open dist
-```
-
-Move `Spotify Lyricify for Mac.app` into your Applications folder and launch it.
+The downloadable build is ad-hoc signed but not Apple-notarized. If macOS blocks the first launch, right-click the app in Finder, choose **Open**, and confirm once. Do not bypass security warnings for copies downloaded from anywhere other than this repository.
 
 On first launch, macOS may ask for permission to control Spotify. This permission is used only to read now-playing information and perform play/pause, previous-track, and next-track actions. You can manage it under **System Settings → Privacy & Security → Automation**.
 
@@ -91,9 +87,10 @@ Build and package a local application bundle:
 swift build
 swift build -c release
 ./scripts/build-app.sh
+./scripts/build-dmg.sh
 ```
 
-The packaging script creates an ad-hoc signed `.app` inside `dist/`. Public distribution still requires the maintainer's own Apple Developer certificate and notarization.
+The packaging scripts create an ad-hoc signed `.app` and `.dmg` inside `dist/`. Fully trusted public distribution still requires the maintainer's own Apple Developer certificate and notarization.
 
 ## Project structure
 

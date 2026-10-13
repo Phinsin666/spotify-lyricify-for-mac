@@ -46,14 +46,12 @@
 
 ## 安装
 
-```bash
-git clone https://github.com/Phinsin666/spotify-lyricify-for-mac.git
-cd spotify-lyricify-for-mac
-./scripts/build-app.sh
-open dist
-```
+1. 从 [Releases](https://github.com/Phinsin666/spotify-lyricify-for-mac/releases/latest) 下载最新的 `.dmg`。
+2. 打开磁盘映像。
+3. 将 **Spotify Lyricify for Mac** 拖入 **Applications／应用程序** 文件夹。
+4. 从“应用程序”中启动。
 
-将 `Spotify Lyricify for Mac.app` 拖入“应用程序”文件夹，然后启动即可。
+下载版本经过本地临时签名，但尚未经过 Apple 公证。如果 macOS 首次阻止运行，请在访达中右键应用，选择“打开”，再确认一次。请勿对从本仓库以外来源下载的副本绕过安全警告。
 
 首次运行时，macOS 会询问是否允许本应用控制 Spotify。该权限只用于读取当前播放信息和执行播放／暂停、上一首、下一首操作，可在“系统设置 → 隐私与安全性 → 自动化”中管理。
 
@@ -80,9 +78,10 @@ swift run DockLyrics
 swift build
 swift build -c release
 ./scripts/build-app.sh
+./scripts/build-dmg.sh
 ```
 
-也可以使用 Xcode 打开 `Package.swift`。构建脚本会在 `dist/` 中生成本地临时签名的 `.app`。公开分发时，维护者仍需使用自己的 Apple Developer 证书完成签名与公证。
+也可以使用 Xcode 打开 `Package.swift`。构建脚本会在 `dist/` 中生成本地临时签名的 `.app` 和 `.dmg`。完全受信任的公开分发仍需要维护者使用自己的 Apple Developer 证书完成签名与公证。
 
 ## 项目结构
 
