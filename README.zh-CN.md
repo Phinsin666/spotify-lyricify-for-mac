@@ -113,7 +113,14 @@ Spotify Lyricify for Mac 是非官方开源项目，与 Spotify、Lyricify、腾
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Phinsin666/spotify-lyricify-for-mac&type=Date)](https://star-history.com/#Phinsin666/spotify-lyricify-for-mac&Date)
+<p align="center">
+  <a href="https://github.com/Phinsin666/spotify-lyricify-for-mac/stargazers">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Phinsin666/spotify-lyricify-for-mac/main/assets/star-history-dark.svg">
+      <img alt="Spotify Lyricify for Mac Star History" src="https://raw.githubusercontent.com/Phinsin666/spotify-lyricify-for-mac/main/assets/star-history-light.svg" width="800">
+    </picture>
+  </a>
+</p>
 
 ## 支持项目
 
