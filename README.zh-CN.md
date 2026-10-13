@@ -112,6 +112,25 @@ Sources/DockLyrics/
 
 Spotify Lyricify for Mac 是非官方开源项目，与 Spotify、Lyricify、腾讯音乐或网易云音乐没有隶属、授权或合作关系。Spotify、QQ 音乐、网易云音乐及 Lyricify 等名称和商标归各自权利人所有。歌词及翻译的权利归原作者和相关权利人所有，请遵守所在地法律及对应服务条款。
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Phinsin666/spotify-lyricify-for-mac&type=Date)](https://star-history.com/#Phinsin666/spotify-lyricify-for-mac&Date)
+
+## 支持项目
+
+本项目完全开源免费。如果它对你有帮助，可以为项目点一个 Star；也可以自愿请作者喝杯咖啡。赞赏不构成购买、订阅或服务承诺。
+
+<table>
+  <tr>
+    <th>支付宝</th>
+    <th>微信支付</th>
+  </tr>
+  <tr>
+    <td><img src="docs/donate-alipay.jpg" alt="支付宝收款码" width="360"></td>
+    <td><img src="docs/donate-wechat.jpg" alt="微信收款码" width="360"></td>
+  </tr>
+</table>
+
 ## 开源协议
 
 [MIT](LICENSE)

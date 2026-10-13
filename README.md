@@ -123,6 +123,25 @@ Issues and pull requests are welcome. Before submitting a change, make sure `swi
 
 Spotify Lyricify for Mac is an unofficial open-source project and is not affiliated with, endorsed by, or sponsored by Spotify, Lyricify, Tencent Music, or NetEase Cloud Music. Spotify, QQ Music, NetEase Cloud Music, Lyricify, and related marks belong to their respective owners. Lyrics and translations remain the property of their respective authors and rights holders. Please comply with applicable laws and the terms of the relevant services.
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Phinsin666/spotify-lyricify-for-mac&type=Date)](https://star-history.com/#Phinsin666/spotify-lyricify-for-mac&Date)
+
+## Support the Project
+
+Spotify Lyricify for Mac is free and open source. If it helps you, consider starring the repository. Donations are entirely optional and do not constitute a purchase, subscription, or service commitment.
+
+<table>
+  <tr>
+    <th>Alipay</th>
+    <th>WeChat Pay</th>
+  </tr>
+  <tr>
+    <td><img src="docs/donate-alipay.jpg" alt="Alipay donation QR code" width="360"></td>
+    <td><img src="docs/donate-wechat.jpg" alt="WeChat Pay donation QR code" width="360"></td>
+  </tr>
+</table>
+
 ## License
 
 [MIT](LICENSE)
