@@ -1,35 +1,50 @@
-# Spotify Lyricify for Mac
+<p align="center">
+  <img src="Sources/DockLyrics/Resources/AppIcon.png" width="128" height="128" alt="Spotify Lyricify for Mac icon">
+</p>
 
-一款为 Spotify for Mac 设计的轻量歌词悬浮条。界面贴近 macOS 程序坞高度，专注显示当前歌词、下一句或外语歌曲的中文翻译。
+<h1 align="center">Spotify Lyricify for Mac</h1>
+
+<p align="center">A lightweight, Dock-height synchronized lyrics overlay for Spotify on macOS.</p>
+
+<p align="center">
+  <strong>English</strong> | <a href="README.zh-CN.md">中文</a>
+</p>
+
+<p align="center">
+  <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-000000?logo=apple">
+  <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white">
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+  <a href="https://github.com/Phinsin666/spotify-lyricify-for-mac/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/Phinsin666/spotify-lyricify-for-mac"></a>
+</p>
 
 ![Spotify Lyricify for Mac](docs/screenshot.png)
 
-> 默认使用繁体中文界面，可在设置中切换为简体中文。
+Spotify Lyricify for Mac keeps the current lyric visible in a compact floating bar designed around the height and visual rhythm of the macOS Dock. The app uses a Traditional Chinese interface by default and can be switched to Simplified Chinese in Settings.
 
-## 功能
+## Features
 
-- 自动读取 Spotify 当前播放的歌曲、歌手、专辑和播放进度
-- 从 QQ 音乐、网易云音乐与 LRCLIB 匹配同步歌词
-- 外语歌曲在歌词源提供译文时显示原文＋中文逐行翻译
-- 中文歌曲显示当前歌词与下一句歌词
-- 繁体中文／简体中文切换
-- 歌名过长时自动横向滚动
-- 自动获取专辑封面
-- 适配浅色、深色和跟随系统外观
-- 自定义字体缩放、透明度、模糊效果和强调色
-- 无边框悬浮窗口，支持鼠标拖动和 macOS 三指拖移
-- 支持所有桌面与全屏辅助显示
-- Dock 图标和菜单栏快捷控制
+- Reads the current track, artist, album, playback position, and state from Spotify for Mac
+- Matches synchronized lyrics across QQ Music, NetEase Cloud Music, and LRCLIB
+- Displays the original line with a provider-supplied Chinese translation for foreign-language songs
+- Displays the current and next line for Chinese songs
+- Supports Traditional and Simplified Chinese
+- Automatically scrolls long track titles
+- Resolves and displays album artwork
+- Supports automatic, light, and dark appearances
+- Offers font scale, opacity, blur, and accent-color customization
+- Provides a borderless floating window with mouse dragging and macOS three-finger drag support
+- Can appear across Spaces and alongside full-screen apps
+- Includes a Dock icon and menu bar playback controls
 
-## 系统要求
+## Requirements
 
-- macOS 14 Sonoma 或更高版本
+- macOS 14 Sonoma or later
 - Spotify for Mac
-- Xcode 16 或兼容 Swift 6 的命令行工具（仅源码构建需要）
+- Xcode 16 or Swift 6-compatible command-line tools when building from source
 
-## 安装
+## Installation
 
-目前可从源码构建：
+Clone the repository and build the application locally:
 
 ```bash
 git clone https://github.com/Phinsin666/spotify-lyricify-for-mac.git
@@ -38,35 +53,37 @@ cd spotify-lyricify-for-mac
 open dist
 ```
 
-将 `Spotify Lyricify for Mac.app` 拖入“应用程序”文件夹，然后启动即可。
+Move `Spotify Lyricify for Mac.app` into your Applications folder and launch it.
 
-首次运行时，macOS 会询问是否允许本应用控制 Spotify。该权限只用于读取当前播放信息和执行播放／暂停、上一首、下一首操作，可在“系统设置 → 隐私与安全性 → 自动化”中管理。
+On first launch, macOS may ask for permission to control Spotify. This permission is used only to read now-playing information and perform play/pause, previous-track, and next-track actions. You can manage it under **System Settings → Privacy & Security → Automation**.
 
-## 开发运行
+## Usage
+
+1. Open Spotify and start playing a track.
+2. Launch Spotify Lyricify for Mac.
+3. The lyrics bar appears near the bottom of the screen and can be dragged anywhere.
+4. Select the `…` button on the right side of the bar to open Settings.
+5. Use the menu bar icon to restore the lyrics window, control Spotify, or quit the app.
+
+If you use a menu bar organizer, the new status icon may initially appear in its hidden section. Expand that section and Command-drag the icon into the always-visible area.
+
+## Lyrics and translations
+
+The app compares matching results from multiple lyrics providers and prefers a result containing usable Chinese line-by-line translations. Translations come from the lyrics provider; song content is not uploaded to a generative AI service.
+
+Synchronized lyrics or translations are not available for every track. Regional releases, remixes, metadata differences, and provider availability can affect matching. This project does not host or distribute a lyrics database.
+
+## Development
+
+Run directly with Swift Package Manager:
 
 ```bash
 swift run DockLyrics
 ```
 
-或者使用 Xcode 打开 `Package.swift`。
+Or open `Package.swift` in Xcode.
 
-## 使用方法
-
-1. 打开 Spotify 并开始播放歌曲。
-2. 启动 Spotify Lyricify for Mac。
-3. 歌词条会自动出现在屏幕下方，可直接拖到其他位置。
-4. 点击歌词条右侧的 `…` 打开设置。
-5. 菜单栏图标可用于重新显示歌词窗口、控制 Spotify 或退出应用。
-
-如果安装了菜单栏折叠工具，新图标可能会被自动收入隐藏区域。展开隐藏区域后，可按住 Command 将图标拖到常驻位置。
-
-## 歌词与翻译
-
-应用会比较多个歌词来源的匹配结果，并优先使用包含可用中文逐行翻译的版本。歌词翻译来自歌词服务本身，不会将歌曲内容上传至生成式 AI。
-
-并非所有歌曲都提供同步歌词或翻译；不同地区、版本和发行信息也可能影响匹配结果。本项目不储存或分发歌词数据库。
-
-## 构建
+Build and package a local application bundle:
 
 ```bash
 swift build
@@ -74,44 +91,36 @@ swift build -c release
 ./scripts/build-app.sh
 ```
 
-构建脚本会在 `dist/` 中生成本地临时签名的 `.app`。公开分发时，维护者仍需使用自己的 Apple Developer 证书完成签名与公证。
+The packaging script creates an ad-hoc signed `.app` inside `dist/`. Public distribution still requires the maintainer's own Apple Developer certificate and notarization.
 
-## 项目结构
+## Project structure
 
 ```text
 Sources/DockLyrics/
-├── DockLyricsApp.swift           # 应用、窗口和菜单栏入口
-├── PlaybackModel.swift           # 播放状态与歌词时间轴
-├── SpotifyNowPlayingClient.swift # Spotify AppleScript 集成
-├── LyricsProvider.swift          # 多歌词源查询、排序与翻译配对
-├── ArtworkResolver.swift         # 专辑封面解析
-├── LyricsBarView.swift           # 歌词悬浮条
-└── SettingsView.swift            # 设置界面
+├── DockLyricsApp.swift           # App, floating window, and menu bar entry
+├── PlaybackModel.swift           # Playback state and lyric timeline
+├── SpotifyNowPlayingClient.swift # Local Spotify AppleScript integration
+├── LyricsProvider.swift          # Provider lookup, ranking, and translation matching
+├── ArtworkResolver.swift         # Album artwork resolution
+├── LyricsBarView.swift           # Floating lyrics interface
+└── SettingsView.swift            # Appearance and language settings
 ```
 
-## 隐私
+## Privacy
 
-- 不需要 Spotify Web API Client ID。
-- 不收集账号、播放历史或个人数据。
-- Spotify 播放信息通过本机 AppleScript 读取。
-- 歌曲标题、歌手、专辑和时长会发送给歌词服务用于搜索匹配。
+- No Spotify Web API client ID is required.
+- The app does not collect account information, listening history, or personal data.
+- Spotify playback information is read locally through AppleScript.
+- Track title, artist, album, and duration are sent to lyrics services only to find a matching result.
 
-## 贡献
+## Contributing
 
-欢迎提交 Issue 和 Pull Request。提交代码前请确保 `swift build` 通过，并尽量保持界面文本同时兼容繁体与简体中文。详情见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+Issues and pull requests are welcome. Before submitting a change, make sure `swift build` succeeds and keep interface text compatible with both Traditional and Simplified Chinese whenever possible. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-## 免责声明
+## Disclaimer
 
-Spotify Lyricify for Mac 是非官方开源项目，与 Spotify、Lyricify、腾讯音乐或网易云音乐没有隶属、授权或合作关系。Spotify、QQ 音乐、网易云音乐及 Lyricify 等名称和商标归各自权利人所有。歌词及翻译的权利归原作者和相关权利人所有，请遵守所在地法律及对应服务条款。
+Spotify Lyricify for Mac is an unofficial open-source project and is not affiliated with, endorsed by, or sponsored by Spotify, Lyricify, Tencent Music, or NetEase Cloud Music. Spotify, QQ Music, NetEase Cloud Music, Lyricify, and related marks belong to their respective owners. Lyrics and translations remain the property of their respective authors and rights holders. Please comply with applicable laws and the terms of the relevant services.
 
 ## License
 
 [MIT](LICENSE)
-
----
-
-### English
-
-Spotify Lyricify for Mac is an unofficial, open-source, Dock-height lyrics overlay for Spotify on macOS. It supports synchronized lyrics, provider-supplied Chinese translations, album artwork, Traditional/Simplified Chinese UI, appearance customization, Dock presence, and menu-bar controls.
-
-Build with `./scripts/build-app.sh`. macOS 14 or later is required.
