@@ -1,5 +1,7 @@
 # Spotify Lyricify for Mac
 
+前排提醒：此软件适合隐藏 dock使用更佳。
+
 一款为 Spotify for Mac 设计的轻量歌词悬浮条。界面贴近 macOS 程序坞高度，专注显示当前歌词、下一句或外语歌曲的中文翻译。
 
 ![Spotify Lyricify for Mac](docs/screenshot.png)
