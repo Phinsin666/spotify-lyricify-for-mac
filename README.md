@@ -17,6 +17,8 @@
   <a href="https://github.com/Phinsin666/spotify-lyricify-for-mac/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/Phinsin666/spotify-lyricify-for-mac"></a>
 </p>
 
+> **Tip:** The app works especially well when the macOS Dock is set to automatically hide and show.
+
 ![Spotify Lyricify for Mac](docs/screenshot.png)
 
 Spotify Lyricify for Mac keeps the current lyric visible in a compact floating bar designed around the height and visual rhythm of the macOS Dock. The app uses a Traditional Chinese interface by default and can be switched to Simplified Chinese in Settings.

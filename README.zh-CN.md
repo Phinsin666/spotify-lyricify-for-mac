@@ -17,6 +17,8 @@
   <a href="https://github.com/Phinsin666/spotify-lyricify-for-mac/releases"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/Phinsin666/spotify-lyricify-for-mac"></a>
 </p>
 
+> **提示：** 将 macOS 程序坞设为自动隐藏，可获得更好的使用体验。
+
 ![Spotify Lyricify for Mac](docs/screenshot.png)
 
 默认使用繁体中文界面，可在设置中切换为简体中文。
