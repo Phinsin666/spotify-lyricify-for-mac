@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct LyricsBarView: View {
@@ -5,49 +6,39 @@ struct LyricsBarView: View {
     @State private var isHovering = false
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !model.isPlaying)) { timeline in
-            let position = model.position(at: timeline.date)
-            let lyricPosition = model.lyricPosition(at: timeline.date)
-
-            HStack(spacing: 24) {
-                if model.showSongInfo {
-                    SongIdentityView()
-                        .frame(width: 250, alignment: .leading)
-                        .clipped()
-                        .transition(.opacity.combined(with: .move(edge: .leading)))
-                }
-
-                LyricContentView(position: lyricPosition)
-                    .frame(maxWidth: .infinity)
+        HStack(spacing: 24) {
+            if model.showSongInfo {
+                SongIdentityView()
+                    .frame(width: 250, alignment: .leading)
                     .clipped()
+                    .transition(.opacity.combined(with: .move(edge: .leading)))
+            }
 
-                HoverControls(isHovering: isHovering)
-                    .frame(width: 150, alignment: .trailing)
-            }
-            .padding(.horizontal, 22)
-            .padding(.vertical, 12)
-            .background {
-                barBackground
-                WindowDragSurface()
-            }
-            .overlay(alignment: .bottomLeading) {
-                GeometryReader { proxy in
-                    Capsule()
-                        .fill(model.accentColor)
-                        .frame(width: proxy.size.width * position / model.duration, height: 2)
-                        .shadow(color: model.accentColor.opacity(0.8), radius: 5)
-                }
+            LiveLyricContentView()
+                .frame(maxWidth: .infinity)
+                .clipped()
+
+            HoverControls(isHovering: isHovering)
+                .frame(width: 150, alignment: .trailing)
+        }
+        .padding(.horizontal, 22)
+        .padding(.vertical, 12)
+        .background {
+            barBackground
+            WindowDragSurface()
+        }
+        .overlay(alignment: .bottomLeading) {
+            PlaybackProgressView()
                 .frame(height: 2)
                 .padding(.horizontal, 5)
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .strokeBorder(.white.opacity(0.20), lineWidth: 1)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .onHover { hovering in
-                withAnimation(.easeOut(duration: 0.18)) { isHovering = hovering }
-            }
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .strokeBorder(.white.opacity(0.20), lineWidth: 1)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .onHover { hovering in
+            withAnimation(.easeOut(duration: 0.18)) { isHovering = hovering }
         }
         .padding(2)
         .preferredColorScheme(model.preferredColorScheme)
@@ -67,6 +58,33 @@ struct LyricsBarView: View {
     private var baseTint: some View {
         Color(nsColor: .windowBackgroundColor)
             .opacity(model.backgroundOpacity)
+    }
+}
+
+private struct LiveLyricContentView: View {
+    @EnvironmentObject private var model: PlaybackModel
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !model.isPlaying)) { timeline in
+            LyricContentView(position: model.lyricPosition(at: timeline.date))
+        }
+    }
+}
+
+private struct PlaybackProgressView: View {
+    @EnvironmentObject private var model: PlaybackModel
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !model.isPlaying)) { timeline in
+            GeometryReader { proxy in
+                let position = model.position(at: timeline.date)
+                let progress = min(max(position / model.duration, 0), 1)
+                Capsule()
+                    .fill(model.accentColor)
+                    .frame(width: proxy.size.width * progress, height: 2)
+                    .shadow(color: model.accentColor.opacity(0.8), radius: 5)
+            }
+        }
     }
 }
 
@@ -120,36 +138,16 @@ private struct SongIdentityView: View {
 private struct MarqueeText: View {
     let text: String
     let font: Font
-    @State private var textWidth = 0.0
     @State private var containerWidth = 0.0
-    @State private var epoch = Date()
+    @State private var scrollOffset = 0.0
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
-            let overflow = max(0, textWidth - containerWidth)
-            let travelTime = max(1.2, overflow / 28)
-            let pause = 1.5
-            let cycle = pause + travelTime + pause + travelTime
-            let elapsed = timeline.date.timeIntervalSince(epoch).truncatingRemainder(dividingBy: cycle)
-            let progress: Double = {
-                if overflow == 0 || elapsed < pause { return 0 }
-                if elapsed < pause + travelTime { return (elapsed - pause) / travelTime }
-                if elapsed < pause + travelTime + pause { return 1 }
-                return 1 - (elapsed - pause - travelTime - pause) / travelTime
-            }()
-
-            Text(text)
-                .font(font)
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
-                .background {
-                    GeometryReader { proxy in
-                        Color.clear.preference(key: MarqueeTextWidthKey.self, value: proxy.size.width)
-                    }
-                }
-                .offset(x: -overflow * progress)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
+        Text(text)
+            .font(font)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
+            .offset(x: scrollOffset)
+            .frame(maxWidth: .infinity, alignment: .leading)
         .background {
             GeometryReader { proxy in
                 Color.clear
@@ -158,15 +156,42 @@ private struct MarqueeText: View {
             }
         }
         .clipped()
-        .onPreferenceChange(MarqueeTextWidthKey.self) { textWidth = $0 }
-        .onChange(of: text) { _, _ in epoch = Date() }
-    }
-}
+        .task(id: animationID) {
+            scrollOffset = 0
+            let overflow = max(0, measuredTextWidth - containerWidth)
+            guard overflow > 1 else { return }
 
-private struct MarqueeTextWidthKey: PreferenceKey {
-    static let defaultValue = 0.0
-    static func reduce(value: inout Double, nextValue: () -> Double) {
-        value = max(value, nextValue())
+            let pause = 1.5
+            let travelTime = max(1.2, overflow / 52)
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(pause))
+                guard !Task.isCancelled else { return }
+                withAnimation(.linear(duration: travelTime)) {
+                    scrollOffset = -overflow
+                }
+
+                try? await Task.sleep(for: .seconds(travelTime + pause))
+                guard !Task.isCancelled else { return }
+                var reset = Transaction()
+                reset.disablesAnimations = true
+                withTransaction(reset) {
+                    scrollOffset = 0
+                }
+            }
+        }
+    }
+
+    /// Measuring outside SwiftUI's proposed layout avoids the text being
+    /// reported as exactly the clipped container width.
+    private var measuredTextWidth: CGFloat {
+        let base = NSFont.systemFont(ofSize: 17, weight: .semibold)
+        let descriptor = base.fontDescriptor.withDesign(.rounded) ?? base.fontDescriptor
+        let measuredFont = NSFont(descriptor: descriptor, size: 17) ?? base
+        return ceil((text as NSString).size(withAttributes: [.font: measuredFont]).width) + 4
+    }
+
+    private var animationID: String {
+        "\(text)|\(Int(containerWidth.rounded()))"
     }
 }
 
