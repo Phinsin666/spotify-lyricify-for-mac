@@ -119,9 +119,10 @@ private struct SongIdentityView: View {
             VStack(alignment: .leading, spacing: 5) {
                 MarqueeText(
                     text: model.localizedLyricText(model.title),
-                    font: .system(size: 17, weight: .semibold, design: .rounded)
+                    font: .system(size: 17, weight: .semibold, design: .rounded),
+                    containerWidth: 175
                 )
-                .frame(height: 22)
+                .frame(width: 175, height: 22)
                 Text(model.localizedLyricText(model.artist))
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
@@ -138,47 +139,20 @@ private struct SongIdentityView: View {
 private struct MarqueeText: View {
     let text: String
     let font: Font
-    @State private var containerWidth = 0.0
-    @State private var scrollOffset = 0.0
+    let containerWidth: CGFloat
+    @State private var epoch = Date()
 
     var body: some View {
-        Text(text)
-            .font(font)
-            .lineLimit(1)
-            .fixedSize(horizontal: true, vertical: false)
-            .offset(x: scrollOffset)
-            .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            GeometryReader { proxy in
-                Color.clear
-                    .onAppear { containerWidth = proxy.size.width }
-                    .onChange(of: proxy.size.width) { _, value in containerWidth = value }
-            }
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: overflow <= 1)) { timeline in
+            Text(text)
+                .font(font)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .offset(x: offset(at: timeline.date))
+                .frame(width: containerWidth, alignment: .leading)
         }
         .clipped()
-        .task(id: animationID) {
-            scrollOffset = 0
-            let overflow = max(0, measuredTextWidth - containerWidth)
-            guard overflow > 1 else { return }
-
-            let pause = 1.5
-            let travelTime = max(1.2, overflow / 52)
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(pause))
-                guard !Task.isCancelled else { return }
-                withAnimation(.linear(duration: travelTime)) {
-                    scrollOffset = -overflow
-                }
-
-                try? await Task.sleep(for: .seconds(travelTime + pause))
-                guard !Task.isCancelled else { return }
-                var reset = Transaction()
-                reset.disablesAnimations = true
-                withTransaction(reset) {
-                    scrollOffset = 0
-                }
-            }
-        }
+        .onChange(of: text) { _, _ in epoch = Date() }
     }
 
     /// Measuring outside SwiftUI's proposed layout avoids the text being
@@ -190,8 +164,26 @@ private struct MarqueeText: View {
         return ceil((text as NSString).size(withAttributes: [.font: measuredFont]).width) + 4
     }
 
-    private var animationID: String {
-        "\(text)|\(Int(containerWidth.rounded()))"
+    private var overflow: CGFloat {
+        max(0, measuredTextWidth - containerWidth)
+    }
+
+    private func offset(at date: Date) -> CGFloat {
+        guard overflow > 1 else { return 0 }
+        let startPause = 1.5
+        let endPause = 1.5
+        let resetPause = 0.2
+        let travelTime = max(1.2, overflow / 52)
+        let cycle = startPause + travelTime + endPause + resetPause
+        let elapsed = date.timeIntervalSince(epoch).truncatingRemainder(dividingBy: cycle)
+
+        if elapsed < startPause { return 0 }
+        if elapsed < startPause + travelTime {
+            let progress = (elapsed - startPause) / travelTime
+            return -overflow * progress
+        }
+        if elapsed < startPause + travelTime + endPause { return -overflow }
+        return 0
     }
 }
 
