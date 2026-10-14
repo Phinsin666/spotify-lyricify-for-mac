@@ -143,7 +143,7 @@ private struct MarqueeText: View {
     @State private var epoch = Date()
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: overflow <= 1)) { timeline in
+        TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: overflow <= 1)) { timeline in
             Text(text)
                 .font(font)
                 .lineLimit(1)
@@ -173,7 +173,7 @@ private struct MarqueeText: View {
         let startPause = 1.5
         let endPause = 1.5
         let resetPause = 0.2
-        let travelTime = max(1.2, overflow / 52)
+        let travelTime = max(1.8, overflow / 34)
         let cycle = startPause + travelTime + endPause + resetPause
         let elapsed = date.timeIntervalSince(epoch).truncatingRemainder(dividingBy: cycle)
 
