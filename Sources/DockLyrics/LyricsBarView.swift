@@ -118,9 +118,7 @@ private struct SongIdentityView: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 MarqueeText(
-                    text: model.localizedLyricText(model.title),
-                    font: .system(size: 17, weight: .semibold, design: .rounded),
-                    containerWidth: 175
+                    text: model.localizedLyricText(model.title)
                 )
                 .frame(width: 175, height: 22)
                 Text(model.localizedLyricText(model.artist))
@@ -136,54 +134,132 @@ private struct SongIdentityView: View {
     }
 }
 
-private struct MarqueeText: View {
+private struct MarqueeText: NSViewRepresentable {
     let text: String
-    let font: Font
-    let containerWidth: CGFloat
-    @State private var epoch = Date()
 
-    var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: overflow <= 1)) { timeline in
-            Text(text)
-                .font(font)
-                .lineLimit(1)
-                .fixedSize(horizontal: true, vertical: false)
-                .offset(x: offset(at: timeline.date))
-                .frame(width: containerWidth, alignment: .leading)
+    func makeNSView(context: Context) -> MarqueeContainerView {
+        MarqueeContainerView()
+    }
+
+    func updateNSView(_ nsView: MarqueeContainerView, context: Context) {
+        nsView.setText(text)
+    }
+
+    final class MarqueeContainerView: NSView {
+        private let textLayer = CATextLayer()
+        private var currentText = ""
+        private var animationSignature = ""
+        private let textFont: NSFont = {
+            let base = NSFont.systemFont(ofSize: 17, weight: .semibold)
+            let descriptor = base.fontDescriptor.withDesign(.rounded) ?? base.fontDescriptor
+            return NSFont(descriptor: descriptor, size: 17) ?? base
+        }()
+
+        override init(frame frameRect: NSRect) {
+            super.init(frame: frameRect)
+            wantsLayer = true
+            layer?.masksToBounds = true
+            textLayer.alignmentMode = .left
+            textLayer.isWrapped = false
+            textLayer.truncationMode = .none
+            layer?.addSublayer(textLayer)
         }
-        .clipped()
-        .onChange(of: text) { _, _ in epoch = Date() }
-    }
 
-    /// Measuring outside SwiftUI's proposed layout avoids the text being
-    /// reported as exactly the clipped container width.
-    private var measuredTextWidth: CGFloat {
-        let base = NSFont.systemFont(ofSize: 17, weight: .semibold)
-        let descriptor = base.fontDescriptor.withDesign(.rounded) ?? base.fontDescriptor
-        let measuredFont = NSFont(descriptor: descriptor, size: 17) ?? base
-        return ceil((text as NSString).size(withAttributes: [.font: measuredFont]).width) + 4
-    }
+        @available(*, unavailable)
+        required init?(coder: NSCoder) { nil }
 
-    private var overflow: CGFloat {
-        max(0, measuredTextWidth - containerWidth)
-    }
-
-    private func offset(at date: Date) -> CGFloat {
-        guard overflow > 1 else { return 0 }
-        let startPause = 1.5
-        let endPause = 1.5
-        let resetPause = 0.2
-        let travelTime = max(1.8, overflow / 34)
-        let cycle = startPause + travelTime + endPause + resetPause
-        let elapsed = date.timeIntervalSince(epoch).truncatingRemainder(dividingBy: cycle)
-
-        if elapsed < startPause { return 0 }
-        if elapsed < startPause + travelTime {
-            let progress = (elapsed - startPause) / travelTime
-            return -overflow * progress
+        func setText(_ text: String) {
+            guard text != currentText else { return }
+            currentText = text
+            updateLayerText()
+            animationSignature = ""
+            needsLayout = true
         }
-        if elapsed < startPause + travelTime + endPause { return -overflow }
-        return 0
+
+        override func layout() {
+            super.layout()
+            guard bounds.width > 0, bounds.height > 0 else { return }
+
+            let measured = measuredWidth
+            let labelWidth = max(measured, bounds.width)
+            let textHeight = ceil((currentText as NSString).size(withAttributes: attributes).height) + 2
+            textLayer.contentsScale = window?.backingScaleFactor
+                ?? NSScreen.main?.backingScaleFactor
+                ?? 2
+            textLayer.frame = NSRect(
+                x: 0,
+                y: floor((bounds.height - textHeight) / 2),
+                width: labelWidth,
+                height: textHeight
+            )
+
+            let signature = "\(currentText)|\(Int(bounds.width.rounded()))|\(Int(measured.rounded()))"
+            guard signature != animationSignature else { return }
+            animationSignature = signature
+            installAnimation(overflow: max(0, measured - bounds.width))
+        }
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if window != nil {
+                animationSignature = ""
+                needsLayout = true
+            }
+        }
+
+        private func installAnimation(overflow: CGFloat) {
+            textLayer.removeAnimation(forKey: "full-title-marquee")
+            guard overflow > 1 else { return }
+
+            let startPause = 1.5
+            let endPause = 1.5
+            let resetDuration = 0.01
+            let travelTime = max(2.2, overflow / 22)
+            let cycle = startPause + travelTime + endPause + resetDuration
+            let startFraction = startPause / cycle
+            let endTravelFraction = (startPause + travelTime) / cycle
+            let endPauseFraction = (startPause + travelTime + endPause) / cycle
+
+            let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+            animation.values = [0, 0, -overflow, -overflow, 0]
+            animation.keyTimes = [
+                0,
+                NSNumber(value: startFraction),
+                NSNumber(value: endTravelFraction),
+                NSNumber(value: endPauseFraction),
+                1
+            ]
+            animation.timingFunctions = [
+                CAMediaTimingFunction(name: .linear),
+                CAMediaTimingFunction(name: .linear),
+                CAMediaTimingFunction(name: .linear),
+                CAMediaTimingFunction(name: .linear)
+            ]
+            animation.duration = cycle
+            animation.repeatCount = .infinity
+            animation.isRemovedOnCompletion = false
+            textLayer.add(animation, forKey: "full-title-marquee")
+        }
+
+        private var measuredWidth: CGFloat {
+            ceil((currentText as NSString).size(withAttributes: attributes).width) + 4
+        }
+
+        private func updateLayerText() {
+            textLayer.string = NSAttributedString(
+                string: currentText,
+                attributes: attributes
+            )
+        }
+
+        override func viewDidChangeEffectiveAppearance() {
+            super.viewDidChangeEffectiveAppearance()
+            updateLayerText()
+        }
+
+        private var attributes: [NSAttributedString.Key: Any] {
+            [.font: textFont, .foregroundColor: NSColor.labelColor]
+        }
     }
 }
 
