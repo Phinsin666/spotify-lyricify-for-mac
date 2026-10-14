@@ -7,16 +7,19 @@ struct LyricsBarView: View {
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !model.isPlaying)) { timeline in
             let position = model.position(at: timeline.date)
+            let lyricPosition = model.lyricPosition(at: timeline.date)
 
             HStack(spacing: 24) {
                 if model.showSongInfo {
                     SongIdentityView()
-                        .frame(width: 210, alignment: .leading)
+                        .frame(width: 250, alignment: .leading)
+                        .clipped()
                         .transition(.opacity.combined(with: .move(edge: .leading)))
                 }
 
-                LyricContentView(position: position)
+                LyricContentView(position: lyricPosition)
                     .frame(maxWidth: .infinity)
+                    .clipped()
 
                 HoverControls(isHovering: isHovering)
                     .frame(width: 150, alignment: .trailing)
@@ -106,7 +109,11 @@ private struct SongIdentityView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .clipped()
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .clipped()
     }
 }
 
@@ -135,13 +142,13 @@ private struct MarqueeText: View {
                 .font(font)
                 .lineLimit(1)
                 .fixedSize(horizontal: true, vertical: false)
-                .offset(x: -overflow * progress)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .background {
                     GeometryReader { proxy in
                         Color.clear.preference(key: MarqueeTextWidthKey.self, value: proxy.size.width)
                     }
                 }
+                .offset(x: -overflow * progress)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background {
             GeometryReader { proxy in
@@ -202,21 +209,24 @@ private struct LyricContentView: View {
     let position: TimeInterval
 
     var body: some View {
+        let displayed = model.displayedLines(at: position)
+        let translation = model.localizedTranslation(for: displayed.current)
+
         VStack(spacing: 5) {
             if model.displayMode != .translation {
-                KaraokeLine(words: model.currentLine.words, position: position)
+                KaraokeLine(words: displayed.current.words, position: position)
                     .font(.system(size: 30 * model.fontScale, weight: .semibold, design: .rounded))
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
             }
 
-            if model.displayMode != .original, !model.translation.isEmpty {
-                Text(model.translation)
+            if model.displayMode != .original, !translation.isEmpty {
+                Text(translation)
                     .font(.system(size: 19 * model.fontScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-            } else if model.translation.isEmpty, let nextLine = model.nextLine {
+            } else if translation.isEmpty, let nextLine = displayed.next {
                 Text(model.localizedLyricText(nextLine.original))
                     .font(.system(size: 18 * model.fontScale, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary.opacity(0.72))
@@ -226,7 +236,7 @@ private struct LyricContentView: View {
         }
         .multilineTextAlignment(.center)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(model.localizedLyricText(model.currentLine.original))，\(model.translation)")
+        .accessibilityLabel("\(model.localizedLyricText(displayed.current.original))，\(translation)")
     }
 }
 

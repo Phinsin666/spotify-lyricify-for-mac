@@ -31,6 +31,7 @@ Spotify Lyricify for Mac keeps the current lyric visible in a compact floating b
 - Displays the current and next line for Chinese songs
 - Supports Traditional and Simplified Chinese
 - Automatically scrolls long track titles
+- Continuously interpolates Spotify playback time and offers ±1 second lyric timing adjustment
 - Resolves and displays album artwork
 - Supports automatic, light, and dark appearances
 - Offers font scale, opacity, blur, and accent-color customization

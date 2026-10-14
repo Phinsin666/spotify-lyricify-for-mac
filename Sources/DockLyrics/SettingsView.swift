@@ -64,6 +64,20 @@ struct SettingsView: View {
                     Text("自動選擇")
                         .foregroundStyle(.secondary)
                 }
+                LabeledContent(localizedLyricTimingTitle) {
+                    HStack(spacing: 10) {
+                        Slider(value: $model.lyricOffset, in: -1...1, step: 0.05)
+                            .frame(width: 185)
+                        Text(String(format: "%+.2f s", model.lyricOffset))
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                            .frame(width: 58, alignment: .trailing)
+                        Button(localizedReset) { model.lyricOffset = 0.12 }
+                    }
+                }
+                Text(localizedLyricTimingHelp)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
                 Text("目前歌曲由 Spotify for Mac 提供。主畫面不會顯示歌詞來源；正式版將透過可替換的供應器依序匹配同步歌詞與翻譯。")
                     .font(.callout)
                     .foregroundStyle(.secondary)
@@ -92,5 +106,19 @@ struct SettingsView: View {
         case .dark: "深色"
         case .light: "浅色"
         }
+    }
+
+    private var localizedLyricTimingTitle: String {
+        model.interfaceLanguage == .traditional ? "歌詞時間微調" : "歌词时间微调"
+    }
+
+    private var localizedLyricTimingHelp: String {
+        model.interfaceLanguage == .traditional
+            ? "預設提前 0.12 秒，與車機版一致。正值讓歌詞更早顯示，負值讓歌詞更晚顯示。"
+            : "默认提前 0.12 秒，与车机版一致。正值让歌词更早显示，负值让歌词更晚显示。"
+    }
+
+    private var localizedReset: String {
+        model.interfaceLanguage == .traditional ? "重設" : "重置"
     }
 }

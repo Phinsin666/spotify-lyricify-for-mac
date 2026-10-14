@@ -51,6 +51,9 @@ final class PlaybackModel: ObservableObject {
     @Published var showSongInfo = true
     @Published var useArtworkAccent = true
     @Published var accentColor = Color(red: 0.12, green: 0.90, blue: 0.47)
+    @Published var lyricOffset = UserDefaults.standard.object(forKey: "lyricOffset") as? Double ?? 0.12 {
+        didSet { UserDefaults.standard.set(lyricOffset, forKey: "lyricOffset") }
+    }
 
     @Published var title = "Night Drive"
     @Published var artist = "Maya Lane"
@@ -104,6 +107,22 @@ final class PlaybackModel: ObservableObject {
     func position(at date: Date) -> TimeInterval {
         guard isPlaying else { return pausedPosition }
         return (pausedPosition + date.timeIntervalSince(startedAt)).truncatingRemainder(dividingBy: duration)
+    }
+
+    /// Mirrors the car version's continuously interpolated playback clock and
+    /// its small 120 ms lyric lead. The user can fine-tune provider-specific
+    /// timestamp drift without changing the actual playback progress display.
+    func lyricPosition(at date: Date) -> TimeInterval {
+        min(max(position(at: date) + lyricOffset, 0), duration)
+    }
+
+    func displayedLines(at position: TimeInterval) -> (current: LyricLine, next: LyricLine?) {
+        guard !lyricLines.isEmpty else { return (currentLine, nextLine) }
+        let index = lyricLines.lastIndex(where: { $0.start <= position }) ?? 0
+        return (
+            lyricLines[index],
+            index + 1 < lyricLines.count ? lyricLines[index + 1] : nil
+        )
     }
 
     func togglePlayback(at date: Date = Date()) {
